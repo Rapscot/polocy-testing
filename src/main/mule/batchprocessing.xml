@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file"
-	xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
 http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="9e5e7846-b508-4f46-b6cb-5eee0587a68b" >
 		<http:listener-connection host="0.0.0.0" port="8081" />
 	</http:listener-config>
+	<api-gateway:autodiscovery apiId="${api.id}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="f5e783e2-42f2-4f15-a8c0-fcfe0dd7d8fc" flowRef="testraml-main" />
 	<flow name="getAllFlow" doc:id="6f003c56-89cc-4a38-bf9d-14ae387a25a2" >
 		<http:listener doc:name="Listener" doc:id="44b03c9a-ac75-41a0-bc3a-1bcac516fb26" config-ref="HTTP_Listener_config" path="/testBatch"/>
 		<file:read doc:id="71b8d2dc-70b4-438e-9d04-f04e21280e83" path="/Users/abasu/AnypointStudio/studio-workspace/batchprocessing/src/main/resources/trees1.csv" outputMimeType="application/csv"/>
@@ -128,7 +130,7 @@ output application/json
 payload[vars.newVar - 1] 
 
 
-//map((value,index)-> 
+//map((value,index)->  
 //	if(vars.newVar == value.Index)	{
 //		"Index" : trim(value.Index),
 //		"Girth" : trim(value.Girth),
