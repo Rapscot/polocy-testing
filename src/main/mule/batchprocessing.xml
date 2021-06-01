@@ -14,7 +14,7 @@ http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/m
 	<api-gateway:autodiscovery apiId="${api.id}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="f5e783e2-42f2-4f15-a8c0-fcfe0dd7d8fc" flowRef="testraml-main" />
 	<flow name="getAllFlow" doc:id="6f003c56-89cc-4a38-bf9d-14ae387a25a2" >
 		<http:listener doc:name="Listener" doc:id="44b03c9a-ac75-41a0-bc3a-1bcac516fb26" config-ref="HTTP_Listener_config" path="/testBatch"/>
-		<file:read doc:id="71b8d2dc-70b4-438e-9d04-f04e21280e83" path="/Users/abasu/AnypointStudio/studio-workspace/batchprocessing/src/main/resources/trees1.csv" outputMimeType="application/csv"/>
+		<file:read doc:id="71b8d2dc-70b4-438e-9d04-f04e21280e83" path="trees1.csv" outputMimeType="application/csv"/>
 		<ee:transform doc:name="Transform Message" doc:id="ae11cebd-7b79-4715-b33a-e8a08752779a">
 							<ee:message>
 								<ee:set-payload><![CDATA[%dw 2.0
@@ -67,7 +67,7 @@ output application/java
 [payload]]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<file:read doc:name="Read" doc:id="48ba5d63-8355-4c1c-8db6-fb5f120869d3" path="/Users/abasu/AnypointStudio/studio-workspace/batchprocessing/src/main/resources/trees1.csv"/>
+		<file:read doc:name="Read" doc:id="48ba5d63-8355-4c1c-8db6-fb5f120869d3" path="trees1.csv"/>
 		<ee:transform doc:name="Transform Message" doc:id="8ec36192-d6a5-4abd-a5a3-28f401a0422f" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
@@ -91,7 +91,7 @@ payload ++ vars.newVar]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 		<logger level="INFO" doc:name="Logger" doc:id="2427f50e-98bc-4e86-9dac-21a41600c1ec" message="#[payload]"/>
-		<file:write doc:name="Write" doc:id="e0a16f3a-7868-4c5b-9961-2c0a988db25b" path="/Users/abasu/AnypointStudio/studio-workspace/batchprocessing/src/main/resources/write.json"/>
+		<file:write doc:name="Write" doc:id="e0a16f3a-7868-4c5b-9961-2c0a988db25b" path="write.json"/>
 		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="90223632-86cd-41db-8c2f-a5f53714f9b4" />
 	</flow>
 	<flow name="getFlow" doc:id="f1dc35aa-c0d8-40b3-bab6-3da178e812ce" >
@@ -107,7 +107,7 @@ import * from dw::core::Strings
 substringAfterLast(attributes.queryString, "=")]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<file:read doc:name="Read" doc:id="b1bfcf29-05bf-4a33-817f-6a967a8ae8df" path="/Users/abasu/AnypointStudio/studio-workspace/batchprocessing/src/main/resources/trees1.csv"/>
+		<file:read doc:name="Read" doc:id="b1bfcf29-05bf-4a33-817f-6a967a8ae8df" path="trees1.csv"/>
 		<ee:transform doc:name="Transform Message" doc:id="b59c5c2b-134a-47c2-b41e-ee75c4d0e6d9" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
