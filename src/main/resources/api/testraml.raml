@@ -1,0 +1,60 @@
+#%RAML 1.0
+title: testRaml
+protocols:
+  - HTTP
+  - HTTPS
+
+traits:
+  jwt: !include traits/errorTrait.raml
+
+# securitySchemes:
+#   customSecuritySchemes: !include security_schema/securityScheme.raml
+
+# securedBy:
+#   - customSecuritySchemes
+    
+
+/addRec:
+  post:
+    is: [jwt]
+    description: Add a new record in json
+    body:
+      application/json:
+        example: !include example/addrecord.json
+
+    responses:
+      201:
+        body:
+          application/json:
+            example: !include example/recordResponse.json
+
+/getRec:
+  get:
+    is: [jwt]
+    description: Get a single record
+    queryParameters:
+      Index: 
+        type: integer
+        required: true
+        example: 1
+
+    responses:
+      200:
+        body:
+          application/json:
+            example: !include example/addrecord.json
+              
+/getAllRec:
+  get:
+    is: [jwt]
+    description: Get all record
+    responses:
+      200:
+        body:
+          application/json:
+            example: !include example/getRec.json
+              
+          
+      
+              
+          

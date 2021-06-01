@@ -1,0 +1,9 @@
+#%RAML 1.0 SecurityScheme
+type: x-clientId enforcement
+describedBy:
+  headers:
+    Authorization: 
+      type: string
+  responses:
+    401: 
+      description: "401 - Unauthorized user"

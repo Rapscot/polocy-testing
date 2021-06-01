@@ -1,0 +1,17 @@
+#%RAML 1.0 Trait
+
+headers:
+  authorization:
+    description: Bearer 
+    type: string
+responses:
+  400:
+    body:
+      application/json:
+        example: !include ../example/400.json
+
+  401:
+    body:
+      application/json:
+        example: !include ../example/401.json
+        

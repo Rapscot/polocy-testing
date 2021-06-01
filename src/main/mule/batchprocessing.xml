@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="9e5e7846-b508-4f46-b6cb-5eee0587a68b" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="getAllFlow" doc:id="6f003c56-89cc-4a38-bf9d-14ae387a25a2" >
+		<http:listener doc:name="Listener" doc:id="44b03c9a-ac75-41a0-bc3a-1bcac516fb26" config-ref="HTTP_Listener_config" path="/testBatch"/>
+		<file:read doc:id="71b8d2dc-70b4-438e-9d04-f04e21280e83" path="/Users/abasu/AnypointStudio/studio-workspace/batchprocessing/src/main/resources/trees1.csv" outputMimeType="application/csv"/>
+		<ee:transform doc:name="Transform Message" doc:id="ae11cebd-7b79-4715-b33a-e8a08752779a">
+							<ee:message>
+								<ee:set-payload><![CDATA[%dw 2.0
+input payload application/csv
+output application/json
+---
+payload map(value,index)-> {
+	"Index" : trim(value.Index),
+	"Girth" : trim(value.Girth),
+	"Height" : trim(value.Height),
+	"Volume" : trim(value.Volume)
+}]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="611bf8ae-2209-4386-858d-0bf09b17f97d" message="#[payload]"/>
+		<batch:job jobName="batchprocessingBatch_Job" doc:id="97e783bc-d0c1-40f4-a7e9-6fc99bc84e11" maxConcurrency="4" blockSize="10">
+			<batch:process-records >
+				<batch:step name="Batch_Step" doc:id="238b81de-2c74-444f-af0d-8c0d2137c874" >
+					<logger level="INFO" doc:name="Payload" doc:id="99e94b20-a397-48f8-81d1-62705fc24704" message='#[payload]'/>
+					<batch:aggregator doc:name="Batch Aggregator" doc:id="9d17c1e5-deb6-49e5-a7e8-efa41b5d91a9" size="3">
+						<logger level="INFO" doc:name="Logger" doc:id="471f2283-cf1f-42b9-a500-7e5a7e61c78d" message='#[payload]'/>
+					</batch:aggregator>
+					<ee:transform doc:name="Transform Message" doc:id="24818b6c-a7e7-4fe6-9d46-59143129559a" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+isOdd(payload.Index)]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+					<logger level="INFO" doc:name="Logger" doc:id="a0532c0d-3768-4a43-9f95-771f147e8232" message="#[payload]"/>
+				</batch:step>
+			</batch:process-records>
+			<batch:on-complete>
+				<logger level="INFO" doc:name="Logger" doc:id="66c124bf-8ff2-421e-82a3-74bb5b1fe078" message='#[payload]' />
+			</batch:on-complete>
+		</batch:job>
+		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="d3d8b588-1cb1-4598-9a03-95f4da666340" />
+		<logger level="INFO" doc:name="Logger" doc:id="3f0b5348-a9f1-401d-ba34-1add579fc7b8" message="#[payload]" />
+	</flow>
+	<flow name="addFlow" doc:id="a78a4018-bc12-401c-aef1-55b26f3e8a91" >
+		<http:listener doc:name="Listener" doc:id="aafb872e-5844-4a41-8578-ab969e8fbaa1" config-ref="HTTP_Listener_config" path="/add"/>
+		<ee:transform doc:name="Transform Message" doc:id="a73dc816-1d80-4e44-b755-2b859a51efb6">
+			<ee:message>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="newVar" ><![CDATA[%dw 2.0
+output application/java
+---
+[payload]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<file:read doc:name="Read" doc:id="48ba5d63-8355-4c1c-8db6-fb5f120869d3" path="/Users/abasu/AnypointStudio/studio-workspace/batchprocessing/src/main/resources/trees1.csv"/>
+		<ee:transform doc:name="Transform Message" doc:id="8ec36192-d6a5-4abd-a5a3-28f401a0422f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+input payload application/csv
+output application/json
+---
+payload map(value,index)-> {
+	"Index" : trim(value.Index),
+	"Girth" : trim(value.Girth),
+	"Height" : trim(value.Height),
+	"Volume" : trim(value.Volume)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="5e166809-301c-4586-8aae-8d1397d17fde" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload ++ vars.newVar]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="2427f50e-98bc-4e86-9dac-21a41600c1ec" message="#[payload]"/>
+		<file:write doc:name="Write" doc:id="e0a16f3a-7868-4c5b-9961-2c0a988db25b" path="/Users/abasu/AnypointStudio/studio-workspace/batchprocessing/src/main/resources/write.json"/>
+		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="90223632-86cd-41db-8c2f-a5f53714f9b4" />
+	</flow>
+	<flow name="getFlow" doc:id="f1dc35aa-c0d8-40b3-bab6-3da178e812ce" >
+		<http:listener doc:name="Listener" doc:id="a014d55b-02d1-4f72-8f5f-b2e68a4c95f6" config-ref="HTTP_Listener_config" path="/getRec"/>
+		<ee:transform doc:name="Transform Message" doc:id="dc160c00-c9ad-4422-abba-da714d8f92a4" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="newVar" ><![CDATA[%dw 2.0
+output application/java
+import * from dw::core::Strings
+---
+substringAfterLast(attributes.queryString, "=")]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<file:read doc:name="Read" doc:id="b1bfcf29-05bf-4a33-817f-6a967a8ae8df" path="/Users/abasu/AnypointStudio/studio-workspace/batchprocessing/src/main/resources/trees1.csv"/>
+		<ee:transform doc:name="Transform Message" doc:id="b59c5c2b-134a-47c2-b41e-ee75c4d0e6d9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+input payload application/csv
+output application/json
+---
+payload map(value,index)-> {
+	"Index" : trim(value.Index),
+	"Girth" : trim(value.Girth),
+	"Height" : trim(value.Height),
+	"Volume" : trim(value.Volume)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="343ae2a0-61a4-430b-899d-2beef8a8b977" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload[vars.newVar - 1] 
+
+
+//map((value,index)-> 
+//	if(vars.newVar == value.Index)	{
+//		"Index" : trim(value.Index),
+//		"Girth" : trim(value.Girth),
+//		"Height" : trim(value.Height),
+//		"Volume" : trim(value.Volume)
+//		}
+//	else
+//		"No such Index"
+//)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
